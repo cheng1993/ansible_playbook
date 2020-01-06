@@ -1,0 +1,5 @@
+# is nginx?
+is_nginx: true
+is_proxy: true
+is_https: true
+is_rewrite: true

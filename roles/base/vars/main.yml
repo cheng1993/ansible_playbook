@@ -1,0 +1,3 @@
+---
+# vars file for base
+packages: ['chrony','nfs-utils', 'lrzsz', 'net-tools', 'rsync', 'wget', 'glances', 'vim', 'bash-completion', 'tree', 'MySQL-python', 'mariadb']

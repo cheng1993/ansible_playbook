@@ -1,0 +1,9 @@
+# is nginx?
+is_nginx: true
+
+# is php?
+is_php: true
+is_web: true
+is_http: true
+is_php_https: true
+is_php_site: true

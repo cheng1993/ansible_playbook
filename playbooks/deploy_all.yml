@@ -1,0 +1,9 @@
+- import_playbook: deploy_base.yml
+- import_playbook: deploy_redis.yml
+- import_playbook: deploy_nfs.yml
+- import_playbook: deploy_rsync.yml
+- import_playbook: deploy_lsyncd.yml
+- import_playbook: deploy_php.yml
+- import_playbook: deploy_nginx.yml
+- import_playbook: deploy_kodcloud.yml
+- import_playbook: deploy_wecenter.yml

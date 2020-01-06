@@ -1,0 +1,43 @@
+---
+# tasks file for mariadb
+- name: Install mariadb-server
+  yum:
+    name: mariadb-server
+    state: latest
+
+- name: Config mariadb-server
+  copy:
+    src: my.cnf.j2
+    dest: /etc/my.cnf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart mariadb
+
+- name: Start mariadb
+  systemd:
+    name: mariadb
+    state: started
+    enabled: yes
+
+- name: set mysql root password
+  shell: /usr/bin/mysqladmin -uroot  password "123456"
+  ignore_errors: yes
+  run_once: true
+
+- name: Create Database 
+  mysql_db:
+    login_user: root
+    login_password: '123456' 
+    name: "{{ database_name }}"
+    state: present
+
+- name: Create Remote User name 'all' and password '123456' with all database privileges
+  mysql_user:
+    login_user: root
+    login_password: '123456'
+    name: all
+    host: '%'
+    password: '123456'
+    priv: '*.*:ALL'
+    state: present

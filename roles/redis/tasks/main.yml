@@ -1,0 +1,21 @@
+---
+# tasks file for redis
+- name: Install redis
+  yum:
+    name: redis
+    state: latest
+
+- name: Config redis
+  template:
+    src: redis.conf.j2
+    dest: /etc/redis.conf
+    owner: redis
+    group: root
+    mode: '0640'
+  notify: Restart redis
+
+- name: Start redis
+  systemd:
+    name: redis
+    state: started
+    enabled: yes

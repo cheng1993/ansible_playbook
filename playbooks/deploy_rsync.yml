@@ -1,0 +1,4 @@
+---
+- hosts: backup
+  roles:
+  - role: rsync

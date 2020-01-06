@@ -1,0 +1,38 @@
+---
+# tasks file for keepalived
+- name: Install keepalived
+  yum:
+    name: keepalived
+    state: latest
+
+- name: Create script directory
+  file:
+    path: /server/scripts
+    state: directory
+    recurse: yes
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: copy script
+  copy:
+    src: chk_nginx_proxy.sh
+    dest: /server/scripts/chk_nginx_proxy.sh
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Config Keepalived
+  template:
+    src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart keepalived
+
+- name: Start keepalived
+  systemd:
+    name: keepalived
+    state: started
+    enabled: yes

@@ -1,0 +1,11 @@
+---
+# handlers file for chrony
+- name: Restart chrony
+  systemd:
+    name: chronyd
+    state: restarted
+
+- name: Restart firewalld
+  systemd:
+    name: firewalld
+    state: restarted

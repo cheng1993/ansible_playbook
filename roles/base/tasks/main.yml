@@ -1,0 +1,124 @@
+---
+# tasks file for base
+
+- name: Start chrony
+  systemd:
+    name: chronyd
+    state: started
+    enabled: yes
+
+- name: Config time sync
+  template:
+    src: chrony_client.conf.j2
+    dest: /etc/chrony.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart chrony
+
+- name: Add group
+  group:
+    name: '{{ public_group }}'
+    gid: '{{ public_gid }}'
+    state: present
+
+- name: Add user
+  user:
+    name: '{{ public_user }}'
+    uid: '{{ public_uid }}'
+    group: '{{ public_group }}'
+    create_home: no
+    shell: /sbin/nologin
+
+#- name: install epel
+#  yum:
+#    name: epel-release
+#    state: latest
+
+- name: Add nginx Yum Repository
+  yum_repository:
+    name: nginx-stable
+    description: nginx-stable Repository
+    file: nginx
+    baseurl: http://nginx.org/packages/centos/$releasever/$basearch/
+    enabled: yes
+    gpgcheck: yes
+    gpgkey: https://nginx.org/keys/nginx_signing.key
+  when: is_nginx
+
+- name: Add Zabbix Yum Repository
+  yum_repository:
+    name: zabbix
+    description: Zabbix Repository
+    file: zabbix
+    baseurl: https://mirrors.tuna.tsinghua.edu.cn/zabbix/zabbix/4.0/rhel/7/x86_64/
+    enabled: yes
+    gpgcheck: no
+
+#- name: Install remi
+#  yum:
+#    name: https://mirrors.tuna.tsinghua.edu.cn/remi/enterprise/remi-release-7.rpm
+#    state: present
+#  when: is_php
+
+- name: copy hosts
+  copy:
+    src: hosts
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: copy sshd_config
+  copy:
+    src: sshd_config
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart sshd
+
+- name: Install zabbix-agent
+  yum:
+    name: zabbix-agent
+    state: present
+
+- name: Config zabbix-agent
+  template:
+    src: zabbix_agentd.conf.j2
+    dest: /etc/zabbix/zabbix_agentd.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart zabbix-agent
+
+- name: Start zabbix-agent
+  systemd:
+    name: zabbix-agent
+    state: started
+    enabled: yes
+
+#- name: install base packages
+#  yum:
+#    name: '{{ packages }}'
+#    state: latest
+
+- name: Start Firewalld Service
+  systemd:
+    name: firewalld
+    state: started
+    enabled: yes
+  when: is_proxy
+
+- name: Configure Firewalld Nginx Proxy Rule Port
+  firewalld:
+    zone: public
+    port: "{{ item }}"
+    immediate: yes
+    permanent: yes
+    state: enabled
+  loop:
+    - 80/tcp
+    - 443/tcp
+  notify: Restart firewalld
+  when: is_proxy

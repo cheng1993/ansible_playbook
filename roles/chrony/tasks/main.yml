@@ -1,0 +1,68 @@
+---
+# tasks file for chrony
+- name: Install chrony
+  yum:
+    name: chrony
+    state: present
+
+- name: Config chrony server
+  template:
+    src: chrony_server.conf.j2
+    dest: /etc/chrony.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart chrony
+
+- name: Start chrony
+  systemd:
+    name: chronyd
+    state: started
+    enabled: yes
+
+- name: Start Firewalld Service
+  systemd:
+    name: firewalld
+    state: started
+    enabled: yes
+
+- name: config firewalld
+  firewalld:
+    zone: public
+    masquerade: 'yes'
+    permanent: 'yes'
+    immediate: 'yes'
+    state: enabled
+  notify: Restart firewalld
+  
+- name: config firewalld
+  firewalld:
+    zone: public
+    service: ntp
+    permanent: 'yes'
+    immediate: 'yes'
+    state: enabled
+  notify: Restart firewalld
+
+- name: config firewalld
+  firewalld:
+    zone: public
+    rich_rule: "rule family=ipv4 source address='172.16.1.0/24' accept"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  notify: Restart firewalld
+
+- name: config firewalld
+  firewalld:
+    zone: public
+    rich_rule: "{{ item }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  loop:
+    - "rule family=ipv4 source address=172.16.1.0/24 accept"
+    - "rule family=ipv4 source address=10.0.0.5/32 accept"
+    - "rule family=ipv4 source address=10.0.0.6/32 accept"
+  notify: Restart firewalld
+  when: is_proxy

@@ -1,0 +1,6 @@
+---
+# handlers file for lsyncd
+- name: Restart lsyncd
+  systemd:
+    name: lsyncd
+    state: restarted

@@ -1,0 +1,23 @@
+settings {
+  logfile = "/var/log/lsyncd/lsyncd.log",
+  statusFile = "/var/log/lsyncd/lsyncd.status",
+  inotifyMode = "CloseWrite",
+  maxProcesses = 8,
+}
+
+sync {
+  default.rsync,
+  source = "{{ data_dir }}",
+  target = "{{ rsync_auth_user }}@{{ rsync_server }}::{{ rsync_module }}",
+  delete= true,
+  exclude = { ".*" },
+  delay = 1,
+  rsync = {
+    binary = "/usr/bin/rsync",
+    archive = true,
+    compress = true,
+    verbose = true,
+    password_file = "/etc/{{ auth_file }}",
+    _extra = {"--bwlimit=200"}
+  }
+}

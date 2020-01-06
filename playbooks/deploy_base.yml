@@ -1,0 +1,5 @@
+#- hosts: ['web','nfs','backup','db']
+#- hosts: ['172.16.1.61']
+- hosts: all
+  roles:
+    - role: base

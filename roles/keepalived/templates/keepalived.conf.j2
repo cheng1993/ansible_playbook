@@ -1,0 +1,28 @@
+global_defs {
+   router_id {{ ansible_hostname }}
+}
+
+vrrp_script chk_nginx_proxy {
+    script "/server/scripts/chk_nginx_proxy.sh"
+    interval 1
+    weight -60
+}
+
+vrrp_instance VI_1 {
+    state {{ state }}
+    interface eth0
+    virtual_router_id 55
+    priority {{ priority }}
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        10.0.0.3/24 dev eth0 label eth0:1
+    }
+    track_script {
+        chk_nginx_proxy
+    }
+}
+

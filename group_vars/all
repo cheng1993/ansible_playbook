@@ -1,0 +1,58 @@
+# time sync
+chrony_server: 172.16.1.61
+
+# create public group
+public_group: www
+public_gid: 1024
+
+# create public user
+public_user: www
+public_uid: 1024
+
+# is nginx?
+is_nginx: false
+
+# is php?
+is_php: false
+
+# rsync variables
+rsync_domain: 172.16.1.0/24
+rsync_auth_user: rsync_backup
+rsync_auth_user_pass: 123456
+auth_file: rsync.passwd
+backup_dir: /backup
+data_dir: /data
+rsync_server: 172.16.1.41
+rsync_module: data
+
+# is ...
+is_proxy: false
+is_rewrite: false
+is_http: false
+is_https: false
+is_web: false
+is_php_site: false
+is_java_site: false
+
+# ssl key
+ssl_key_dir: /etc/nginx/ssl_key
+crt_name: server.crt
+key_name: server.key
+
+# servername
+nginx_port: 80
+codes: /code
+
+# nfs
+nfs_ip: 172.16.1.31
+nfs_kodcloud_dir: /data/kodcloud
+nfs_wecenter_dir: /data/wecenter
+nfs_zrlog_dir: /data/zrlog
+
+# mariadb
+db_server: 172.16.1.51
+db_user: all
+db_passwd: 123456
+
+# zabbix server
+zabbix_server: 172.16.1.71

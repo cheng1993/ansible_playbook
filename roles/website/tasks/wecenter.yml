@@ -1,0 +1,95 @@
+---
+- name: copy config file
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - { src: nginx_template.conf.j2, dest: /etc/nginx/conf.d/proxy_wecenter.oldboyedu.com.conf }
+    - { src: proxy_params.j2, dest: /etc/nginx/proxy_params }
+  notify: Restart nginx
+  when: is_proxy
+  vars:
+    server_name: wecenter.oldboyedu.com
+
+- name: create ssl directory
+  file:
+    path: '{{ ssl_key_dir }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0644'
+  when: is_https
+
+- name: copy key-crt
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - { src: server.key, dest: /etc/nginx/ssl_key/server.key }
+    - { src: server.crt, dest: /etc/nginx/ssl_key/server.crt }
+  notify: Restart nginx
+  when: is_https
+
+- name: Create code dir
+  file:
+    path: '{{ codes }}/wecenter'
+    state: directory
+    recurse: yes
+    owner: '{{ public_user }}'
+    group: '{{ public_group }}'
+    mode: '0755'
+  when: is_web
+
+- name: Copy code
+  unarchive:
+    src: WeCenter_3-3-2.zip
+    dest: '{{ codes }}/wecenter'
+    owner: '{{ public_user }}'
+    group: '{{ public_group }}'
+    copy: yes
+    creates: '{{ codes }}/wecenter/index.php'
+  when: is_php_site
+
+- name: copy config file
+  template:
+    src: nginx_template.conf.j2
+    dest: /etc/nginx/conf.d/web_wecenter.oldboyede.com.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart nginx
+  when: is_php_site
+  vars:
+    server_name: wecenter.oldboyedu.com
+    code_path: /code/wecenter/
+
+- name: Configure NFS Mount
+  mount:
+    src: "{{ nfs_ip }}:{{ nfs_wecenter_dir }}"
+    path: /code/wecenter/uploads
+    fstype: nfs
+    opts: defaults
+    state: mounted
+  when: is_web
+
+#- name: Push wecenter sql file
+#  copy:
+#    src: wecenter.sql
+#    dest: /tmp/wecenter.sql
+#  when: is_php_site
+
+#- name: Import wecenter sql
+#  mysql_db:
+#    login_host: '{{ db_server }}'
+#    login_user: '{{ db_user }}'
+#    login_password: '123456'
+#    name: wecenter
+#    state: import
+#    target: /tmp/wecenter.sql
+#  when: is_php_site

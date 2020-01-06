@@ -1,0 +1,29 @@
+---
+# tasks file for lsyncd
+- name: Install lsyncd
+  yum:
+    name: lsyncd
+    state: latest
+
+- name: Config rsync pass
+  template:
+    src: rsync.passwd.j2
+    dest: /etc/{{ auth_file }}
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Config lsyncd
+  template:
+    src: lsyncd.conf.j2
+    dest: /etc/lsyncd.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart lsyncd
+
+- name: Start lsyncd
+  systemd:
+    name: lsyncd
+    state: started
+    enabled: yes

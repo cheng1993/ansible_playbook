@@ -1,0 +1,5 @@
+---
+# vars file for php
+packages: ['php', 'php-cli', 'php-common', 'php-devel', 'php-embedded', 'php-gd', 'php-mbstring', 'php-pdo', 'php-xml', 'php-fpm', 'php-mysqlnd', 'php-opcache', 'php-mcrypt', 'php-pecl-memcached', 'php-pecl-redis']
+redis_server: 172.16.1.51
+redis_server_port: 6379

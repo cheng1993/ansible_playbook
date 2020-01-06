@@ -1,0 +1,56 @@
+{% if is_proxy %}
+upstream {{ server_name }} {
+{% for host in groups['web'] %}
+	server {{ host }}:{{ nginx_port }};
+{% endfor %}
+}
+server {
+{% if is_http %}
+  listen 80;
+{% endif %}
+{% if is_https %}
+	listen 443 ssl;
+  ssl_certificate   /etc/nginx/ssl_key/{{ crt_name }};
+  ssl_certificate_key  /etc/nginx/ssl_key/{{ key_name }};
+{% endif %}
+	server_name {{ server_name }};
+	location / {
+		proxy_pass http://{{ server_name }};
+		include proxy_params;
+	}
+}
+{% endif %}
+{% if is_rewrite %}
+server {
+        listen 80;
+        server_name  {{ server_name }};
+        return 302 https://$server_name$request_uri;
+}
+{% endif %}
+{% if is_web %}
+server {
+	listen 80;    
+	server_name {{ server_name }};
+	location / {
+		root {{ code_path }};
+{% if is_php %}
+		index index.php index.html;
+{% else %}
+		index index.html index.htm;
+{% endif %}
+	}
+  
+{% if is_php %}
+  location ~ \.php$ {
+		root {{ code_path }};
+      fastcgi_pass   127.0.0.1:9000;
+      fastcgi_index  index.php;
+      fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+{% if is_php_https %}
+      fastcgi_param  HTTPS on;
+{% endif %}
+      include        fastcgi_params;
+  }
+{% endif %}
+}
+{% endif %}

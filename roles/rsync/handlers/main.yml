@@ -1,0 +1,6 @@
+---
+# handlers file for rsync
+- name: Restart rsyncd
+  systemd:
+    name: rsyncd
+    state: restarted

@@ -1,0 +1,24 @@
+uid = {{ public_user }}
+gid = {{ public_group }}
+port = 873
+fake super = yes
+use chroot = no
+max connections = 200
+timeout = 600
+pid file = /var/run/rsyncd.pid
+lock file = /var/run/rsync.lock
+log file = /var/log/rsyncd.log
+ignore errors
+read only = false
+list = false
+hosts allow = {{ rsync_domain }}
+auth users = {{ rsync_auth_user }}
+secrets file = /etc/{{ auth_file }}
+#####################################
+[backup]
+comment = welcome to oldboyedu backup!
+path = {{ backup_dir }}
+
+[data]
+comment = welcome to oldboyedu data!
+path = {{ data_dir }}

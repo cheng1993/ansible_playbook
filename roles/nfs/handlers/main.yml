@@ -1,0 +1,6 @@
+---
+# handlers file for nfs
+- name: Restart nfs
+  systemd:
+    name: nfs
+    state: restarted

@@ -1,0 +1,22 @@
+---
+# handlers file for base
+
+- name: Restart chrony
+  systemd:
+    name: chronyd
+    state: restarted
+
+- name: Restart sshd
+  systemd:
+    name: sshd
+    state: restarted
+
+- name: Restart zabbix-agent
+  systemd:
+    name: zabbix-agent
+    state: restarted
+
+- name: Restart firewalld
+  systemd:
+    name: firewalld
+    state: restarted

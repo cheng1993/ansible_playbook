@@ -1,0 +1,4 @@
+---
+# tasks file for website
+- include: kodcloud.yml
+- include: wecenter.yml

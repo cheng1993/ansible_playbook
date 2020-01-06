@@ -1,0 +1,44 @@
+---
+# tasks file for nfs
+- name: Install nfs-utils
+  yum:
+    name: nfs-utils
+    state: latest
+
+- name: Config nfs-utils
+  template:
+    src: exports.j2
+    dest: /etc/exports
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart nfs
+
+- name: Start nfs
+  systemd:
+    name: nfs
+    state: started
+    enabled: yes
+
+- name: Create directory
+  file:
+    path: '{{ item }}'
+    state: directory
+    recurse: yes
+    owner: '{{ public_user }}'
+    group: '{{ public_group }}'
+    mode: '0755'
+  loop:
+    - /data/kodcloud
+    - /data/wecenter
+    - /data/zrlog
+
+- name: Copy kodcloud Site Data
+  unarchive:
+    src: kodcloud_data.zip
+    dest: "{{ nfs_kodcloud_dir }}"
+    owner: "{{ public_user }}"
+    group: "{{ public_group }}"
+    mode: '0755'
+    copy: yes
+    creates: "{{ nfs_kodcloud_dir }}/data/User/index.html"

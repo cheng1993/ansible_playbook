@@ -1,0 +1,4 @@
+---
+- hosts: ['web','lb']
+  roles:
+  - role: website

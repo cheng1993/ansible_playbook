@@ -1,0 +1,47 @@
+---
+# tasks file for rsync
+- name: Install rsync
+  yum:
+    name: rsync
+    state: latest
+
+- name: Config rsync
+  template:
+    src: rsyncd.conf.j2
+    dest: /etc/rsyncd.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart rsyncd
+
+- name: Config rsync auth
+  template:
+    src: rsync.passwd.j2
+    dest: /etc/{{ auth_file }}
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Start rsyncd
+  systemd:
+    name: rsyncd
+    state: started
+    enabled: yes
+
+- name: Create directory
+  file:
+    path: '{{ backup_dir }}'
+    state: directory
+    recurse: yes
+    owner: '{{ public_user }}'
+    group: '{{ public_group }}'
+    mode: '0755'
+
+- name: Create directory
+  file:
+    path: '{{ data_dir }}'
+    state: directory
+    recurse: yes
+    owner: '{{ public_user }}'
+    group: '{{ public_group }}'
+    mode: '0755'
